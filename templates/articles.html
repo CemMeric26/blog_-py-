@@ -1,0 +1,71 @@
+{%extends "layout.html" %}
+
+{%block body%}
+
+<div class="row">
+    <div class="col-lg-20">
+        <div class="col-lg-20">
+            <h1>Articles</h1>
+            <hr>
+        </div>
+    </div>
+</div>
+
+<div class ="row">
+        <div class="col-lg-8">
+            <form>
+                 {% csrf_token %} 
+                <input type="text" name = "keyword" class="input-sm" maxlength="64" placeholder="Search...">
+              <button type="submit" class="btn btn-danger">Search</button>
+            </form>
+      </div>
+</div>
+
+{%if articles %}
+
+{%for article in articles%}
+
+<div class="row">
+    <div class="col-lg-10">
+        <!-- Post content-->
+        <article>
+            
+            <!-- Post header-->
+            <header class="mb-4">
+                <!-- Post title-->
+                <a href="/articles/article/{{article.id}}"><h1 class="fw-bolder mb-1">{{article.title}}</h1> </a>
+                <hr>
+                <!-- Post meta content-->
+                <div class="text-muted fst-italic mb-2">Posted on {{article.created_date}} by {{article.author.username}}</div>
+                <!-- Post categories-->
+                <hr>
+            </header>
+            <!-- Preview image figure-->
+            {%if article.article_image %}
+            <a href="/articles/article/{{article.id}}">
+                <figure class="mb-4"><img class="img-fluid rounded" src="{{article.article_image.url}}" alt=""></figure>
+            </a>
+            {%endif%}
+            <!-- Post content-->
+            <section class="mb-5">
+                <p>
+                    {{article.content|safe|truncatewords:25}}
+                </p>
+                <a style="float:right" href="/articles/article/{{article.id}}" class="btn btn-danger"> Read more</a>
+                <br>
+            </section>
+        </article>
+        
+    </div>
+    
+</div>
+
+{%endfor%}
+
+{%else%}
+<div class="alert alert-danger"> The article couldn't be found</div>
+{%endif%}
+
+
+
+{%endblock body%}

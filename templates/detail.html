@@ -1,0 +1,82 @@
+{%extends "layout.html"%}
+
+{%block body%}
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Post content-->
+        <article>
+            <!-- Post header-->
+            <header class="mb-4">
+                <!-- Post title-->
+                <h1 class="fw-bolder mb-1">{{article.title}}</h1>
+                <hr>
+                <!-- Post meta content-->
+                <div class="text-muted fst-italic mb-2">Posted on {{article.created_date}} by {{article.author.username}}</div>
+                <!-- Post categories-->
+                <hr>
+
+            </header>
+            
+            <!-- Preview image figure-->
+            {%if article.article_image %}
+            <figure class="mb-4"><img class="img-fluid rounded" src="{{article.article_image.url}}" alt=""></figure>
+            {%endif%}
+            <!-- Post content-->
+            <section class="mb-5">
+                <p>
+                    {{article.content|safe}}
+                </p>
+            </section>
+        </article>
+        <h4>Comments:</h4>
+        {%if comments %}
+            {%for comment in comments%}
+            <!-- Single comment-->
+            <div class="d-flex">
+                <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
+                <div class="ms-3">
+                    <div class="fw-bold" style="padding-left:4px"><strong>{{comment.comment_author}}</strong></div>
+                    <p style="padding-left:4px"> {{comment.comment_date}}
+                    
+                    <br>
+                    {{comment.comment_content}}
+                    </p>
+                </div>
+            </div>
+            <br>
+            {%endfor%}
+            {%else%}
+
+            <div class="alert alert-danger">
+                No Comments on This Article yet..
+                Write the first comment..
+            </div>
+            <br>
+            {%endif%}
+            <br>
+            
+        <div class="card bg-light">
+            <h5 class="card-header"> Add comment:</h5>
+            <div class="card-body">
+                <!-- Comment form-->
+                <form method="post"class="mb-4" action="{%url 'article:comment' article.id %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label style="padding-left:5px" for="formGroupExampleInput">Name:</label>
+                        <input name = "comment_author" type="text" class="form-control" id="formGroupExampleInput" placeholder="İsminizi girin">
+                      </div>
+                      <div class="form-group">
+                        <label style="padding-left:5px" for="formGroupExampleInput">Comment:</label>
+                      <textarea name = "comment_content" class="form-control" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-danger">Add</button>
+                </form>
+            </div>
+        </div>
+    </div>                  
+</div>
+
+
+
+{%endblock%}
