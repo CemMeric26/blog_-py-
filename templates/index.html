@@ -9,12 +9,18 @@
     </p>
 </div>
 
-<p> 
     {% if request.user.is_authenticated %}
-       Logged in as {{request.user.username}}
+        <div class="alert alert-success" role="alert">
+            <h4 class="alert-heading">Well done!</h4>
+           Logged in as {{request.user.username}}
+        </div>
     {%else%}
-        No log in
+    <div class="alert alert-warning" role="alert">
+            Not logged in
+    </div>
     {%endif%}
-</p>
+
+
+
 
 {% endblock body %}

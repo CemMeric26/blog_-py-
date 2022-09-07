@@ -26,3 +26,4 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ['-comment_date']
+

@@ -26,6 +26,8 @@ urlpatterns = [
     path('detail/<int:id>', views.detail,name="detail"),
     path('articles/',include("article.urls")),
     path('user/',include("user.urls")),
+    path('polls/',include('polls.urls')),
+
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
