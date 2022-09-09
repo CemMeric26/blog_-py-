@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<div class = "jumbotron text-center" >
+    <h3>Welcome to my blog</h3>
+    <p>
+        This blog will display your articles!
+    </p>
+</div>
+
+    {% if request.user.is_authenticated %}
+        <div class="alert alert-success" role="alert">
+            <h4 class="alert-heading">Well done!</h4>
+           Logged in as {{request.user.username}}
+        </div>
+    {%else%}
+    <div class="alert alert-warning" role="alert">
+            Not logged in
+    </div>
+    {%endif%}
+
+
+
+
+{% endblock body %}

@@ -19,11 +19,7 @@ def articles(request):
     return render(request,"articles.html",{"articles":articles})
 
 def index(request):
-    context = {
-        "numbers": [1,2,3,4,5],
-        "number2": 20,
-    }
-    return render(request,"index.html",context)
+    return render(request,"index.html")
 
 def about(request):
     return render(request,"about.html")
@@ -56,7 +52,7 @@ def addArticle(request):
         article.author = request.user
         article.save()
 
-        messages.success(request,"Article has been succesfully created")
+        messages.success(request,"Article has been successfully created")
         return redirect("index")
 
 

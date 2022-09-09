@@ -60,7 +60,7 @@
             <h5 class="card-header"> Add comment:</h5>
             <div class="card-body">
                 <!-- Comment form-->
-                <form method="post"class="mb-4" action="{%url 'article:comment' article.id %}">
+                <form method="post" class="mb-4" action="{%url 'article:comment' article.id %}">
                     {% csrf_token %}
                     <div class="form-group">
                         <label style="padding-left:5px" for="formGroupExampleInput">Name:</label>

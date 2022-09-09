@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% load crispy_forms_filters %}
+
+{% block body  %}
+{% load crispy_forms_tags %}
+
+    <div class="container">
+        <form method="POST">
+            {% csrf_token %}
+            <legend class="text-center mt-4">Evaluation Form</legend>
+            <p class="text-muted">* compulsory</p>
+            {{ form | crispy }}
+            <div class="form-group">
+                <button class="btn btn-success" type="submit">Submit Evaluation</button>
+            </div>
+        </form>
+        <div>
+            <button> <a href="{% url 'index' %}">Cancel</a> </button>
+        </div>
+    </div>
+
+
+
+{% endblock body  %}
