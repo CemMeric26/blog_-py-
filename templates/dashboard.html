@@ -30,7 +30,7 @@
             <td><a href="/articles/article/{{article.id}}">{{article.title}}</a></td>
             <td>{{article.author.username}}</td>
             <td>{{article.created_date}}</td>
-            <td><a href="{% url "polls:feedback" %}" class="btn btn-danger"> Vote </a></td>
+            <td><a href="/articles/vote/{{ article.id }}" class="btn btn-danger"> Vote </a></td>
             <td><a href="/articles/update/{{article.id}}" class="btn btn-danger"> Update </a></td>
             <td><a href="/articles/delete/{{article.id}}" class="btn btn-danger"> Delete </a></td>
           </tr>

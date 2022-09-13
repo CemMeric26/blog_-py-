@@ -1,15 +1,15 @@
 from django.contrib import admin
 from django.urls import path
-from . import views
-
+from .views import *
 app_name="article"
 
 urlpatterns = [
-   path('dashboard/',views.dashboard,name="dashboard"),
-   path('addarticle/',views.addArticle,name="addarticle"),
-   path('article/<int:id>',views.detail,name="detail"),
-   path('update/<int:id>',views.updateArticle,name="update"),
-   path('delete/<int:id>',views.deleteArticle,name="delete"),
-   path('comment/<int:id>',views.addComment,name="comment"),
-   path('',views.articles,name="articles"),
+   path('dashboard/',DashboardView.as_view(),name="dashboard"),
+   path('addarticle/',AddArticleView.as_view(),name="addarticle"),
+   path('article/<int:id>',DetailView.as_view(),name="detail"),
+   path('update/<int:id>',UpdateArticleView.as_view(),name="update"),
+   path('delete/<int:id>',DeleteArticleView.as_view(),name="delete"),
+   path('comment/<int:id>',AddCommentView.as_view(),name="comment"),
+   path('vote/<int:id>',FeedBackView.as_view(),name="feedback"),
+   path('',ArticlesView.as_view(),name="articles"),
 ]
