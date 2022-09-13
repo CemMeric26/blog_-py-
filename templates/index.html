@@ -3,11 +3,16 @@
 {% block body %}
 
 <div class = "jumbotron text-center" >
-    <h3>Welcome to my blog</h3>
+    <h3>Welcome to Moursera</h3>
     <p>
-        This blog will display your articles!
+        This an course application. You can develop yourself in any field. Begin to learn!!!
     </p>
 </div>
+ <br><br><br><br>
+    <button type="button" class="btn btn-secondary btn-lg btn-block"><a href="{% url 'article:articles'  %}">Search Courses Here !!</a></button>
+
+    <br><br><br><br><br><br><br>
+
 
     {% if request.user.is_authenticated %}
         <div class="alert alert-success" role="alert">

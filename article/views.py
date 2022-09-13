@@ -4,9 +4,9 @@ from django.utils.decorators import method_decorator
 from django.views import View
 
 import article
-from .forms import ArticleForm,PollForm
+from .forms import ArticleForm #,PollForm
 from django.contrib import messages
-from .models import Article,Comment,Poll
+from .models import Article,Comment #,Poll
 # Create your views here.
 
 class ArticlesView(View):
@@ -137,7 +137,7 @@ class AddCommentView(View):
         newComment.save()
         return redirect(reverse("article:detail", kwargs={"id": id}))
 
-class FeedBackView(View):
+"""class FeedBackView(View):
     def get(self,request,id):
         form = PollForm(None)
         #poll = get_object_or_404(Poll,id=id)
@@ -166,3 +166,4 @@ class SuccessView(View):
     def get(self,request):
         return render(request, 'success.html')
 
+"""
