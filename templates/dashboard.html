@@ -9,6 +9,18 @@
     <small>Welcome,</small> <small> {{request.user.username}}</small>
 </p>
 <a class="btn btn-danger" href="/articles/addarticle"> Add Course </a>
+<!--
+
+CAN IMPLEMENT IT WITH REQUEST METHOD BUT INSTEAD I USED METHOD DECORATORS
+SO I USED IT
+
+{ % if request.user.is_teacher % }
+<a class="btn btn-danger" href="/articles/addarticle"> Add Course </a>
+{ % else %}
+    <a class="btn btn-danger" href={ % url "user:loginins" %}> Add Course </a>
+{ % endif %}
+
+-->
 <hr>
 {%if articles%}
 <table class="table table-striped">

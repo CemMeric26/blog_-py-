@@ -4,9 +4,11 @@ from django.utils.decorators import method_decorator
 from django.views import View
 
 import article
-from .forms import ArticleForm #,PollForm
+from .forms import ArticleForm
 from django.contrib import messages
-from .models import Article,Comment #,Poll
+from .models import Article,Comment
+from user.decorators import teacher_required,student_required
+
 # Create your views here.
 
 class ArticlesView(View):
@@ -60,15 +62,21 @@ class DetailView(View):
 
 
 #-------------------------------------------------
-#fix it as a form method
+
+
 class AddArticleView(View):
+
     @method_decorator(login_required(login_url="user:login"))
+    @method_decorator(teacher_required(login_url="user:loginins"))
     def get(self,request):
         form = ArticleForm( None)
 
         return render(request, "addarticle.html", {"form": form})
 
+
+    #@method_decorator(login_required(login_url="user:login"))
     @method_decorator(login_required(login_url="user:login"))
+    @method_decorator(teacher_required(login_url="user:loginins"))
     def post(self, request):
         form = ArticleForm(request.POST or None, request.FILES or None)
 
@@ -86,8 +94,10 @@ class AddArticleView(View):
 
 #--------------------------------
 
+## add teacher required methods to necessary articleviews
 class UpdateArticleView(View):
     @method_decorator(login_required(login_url="user:login"))
+    @method_decorator(teacher_required(login_url="user:loginins"))
     def get(self,request,id):
         article = get_object_or_404(Article, id=id)
 
@@ -95,6 +105,7 @@ class UpdateArticleView(View):
         return render(request, "update.html", {"form": form})
 
     @method_decorator(login_required(login_url="user:login"))
+    @method_decorator(teacher_required(login_url="user:loginins"))
     def post(self, request, id):
         article = get_object_or_404(Article, id=id)
 
@@ -115,6 +126,7 @@ class UpdateArticleView(View):
 
 class DeleteArticleView(View):
     @method_decorator(login_required(login_url="user:login"))
+    @method_decorator(teacher_required(login_url="user:loginins"))
     def get(self,request,id):
         article = get_object_or_404(Article, id=id)
         article.delete()
@@ -126,6 +138,8 @@ class DeleteArticleView(View):
 #----------------------------------------------------------------
 
 class AddCommentView(View):
+    @method_decorator(login_required(login_url="user:login"))
+    @method_decorator(student_required(login_url="user:loginstu"))
     def post(self,request,id,*args,**kwargs):
         article = get_object_or_404(Article, id=id)
         comment_author = request.POST.get("comment_author")
@@ -137,33 +151,3 @@ class AddCommentView(View):
         newComment.save()
         return redirect(reverse("article:detail", kwargs={"id": id}))
 
-"""class FeedBackView(View):
-    def get(self,request,id):
-        form = PollForm(None)
-        #poll = get_object_or_404(Poll,id=id)
-        context = {'form': form}
-        return render(request, 'feedback.html', context)
-    def post(self,request,id):
-        form = PollForm(request.POST or None, request.FILES or None)
-        if form.is_valid():
-            poll = form.save(commit=False)
-
-
-            poll.article_name_id = id
-            poll.save()
-
-            messages.success(request, "Evaluation has been successfully created")
-            return redirect("index")
-
-        #poll = get_object_or_404(Poll)
-        context = {'form': form}
-        return render(request, 'feedback.html', context)
-
-
-
-
-class SuccessView(View):
-    def get(self,request):
-        return render(request, 'success.html')
-
-"""

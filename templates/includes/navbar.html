@@ -18,6 +18,7 @@
             <li class="nav-item active">
                 <a class="nav-link" href="{% url 'article:articles'  %}">Available Courses</a>
             </li>
+
           </ul>
 
           <ul class="navbar-nav ml-auto">
@@ -25,17 +26,16 @@
           <li class="nav-item active">
             <a class="nav-link" href="{% url 'article:dashboard'  %}">My courses</a>
           </li>
-          <li class="nav-item active">
+            <li class="nav-item active">
             <a class="nav-link" href="{% url 'user:logout'  %}">Log out</a>
           </li>
           {% else %}
-
-          <li class="nav-item active">
+            <li class="nav-item active">
             <a class="nav-link" href="{% url 'user:login'  %}">Log in</a>
           </li>
           {% endif %}
-          <li class="nav-item active">
-            <a class="nav-link" href="{% url 'user:register'  %}">Register</a>
+              <li class="nav-item active">
+            <a class="nav-link" href="{% url 'user:signup'  %}">SignUp</a>
           </li>
 
           </ul>
