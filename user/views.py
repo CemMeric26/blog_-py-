@@ -55,12 +55,12 @@ class StudentSignUpView(View):
         return render(request, "signup_form.html", context)
 
     def post(self, request):
-        form = TeacherSignUpForm(request.POST or None)
+        form = StudentSignUpForm(request.POST or None)
         if form.is_valid():
             user = form.save()
-            # left in hereee
+
             login(request, user)  # this function handles with login process
-            messages.success(request, "Registered succesfully")
+            messages.success(request, "Registered successfully")
             return redirect("index")  # goes to main page after succesfull login
         context = {
             "form": form

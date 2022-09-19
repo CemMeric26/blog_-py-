@@ -64,7 +64,7 @@
                     {% csrf_token %}
                     <div class="form-group">
                         <label style="padding-left:5px" for="formGroupExampleInput">Name:</label>
-                        <input name = "comment_author" type="text" class="form-control" id="formGroupExampleInput" placeholder="İsminizi girin">
+                        <input name = "comment_author" type="text" class="form-control" id="formGroupExampleInput" placeholder="Your name">
                       </div>
                       <div class="form-group">
                         <label style="padding-left:5px" for="formGroupExampleInput">Comment:</label>
@@ -76,6 +76,11 @@
         </div>
     </div>                  
 </div>
+    <br>
+    {% if request.user.is_student %}
+        <button><a href="{% url "article:take" article.id %}" class="btn btn-danger"> Take Course </a></button>
+    {% endif %}
+
 
 
 

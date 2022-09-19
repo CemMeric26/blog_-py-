@@ -23,9 +23,16 @@
 
           <ul class="navbar-nav ml-auto">
           {% if request.user.is_authenticated %}
-          <li class="nav-item active">
-            <a class="nav-link" href="{% url 'article:dashboard'  %}">My courses</a>
-          </li>
+              {% if request.user.is_teacher %}
+                  <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'article:dashboard'  %}">My courses</a>
+                </li>
+              {% else %}
+                  <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'article:takencourses' %}">Taken courses</a>
+                </li>
+              {% endif %}
+
             <li class="nav-item active">
             <a class="nav-link" href="{% url 'user:logout'  %}">Log out</a>
           </li>

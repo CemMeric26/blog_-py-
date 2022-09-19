@@ -1,7 +1,7 @@
 from importlib.resources import contents
 from django.db import models
 from ckeditor.fields import RichTextField
-
+#from user.models import User
 # Create your models here.
 
 class Article(models.Model):
@@ -28,6 +28,10 @@ class Comment(models.Model):
     class Meta:
         ordering = ['-comment_date']
 
-"""class TakenCourse(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='taken_courses')
-    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='taken_courses')"""
+class TakenCourse(models.Model):
+    student = models.ForeignKey("user.Student", on_delete=models.CASCADE, related_name='taken_courses')
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='taken_courses')
+    score = models.FloatField()     #rating for the taken course
+
+    def __str__(self):
+        return self.article.title

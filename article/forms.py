@@ -1,14 +1,14 @@
 from django import forms
-from .models import Article #,Poll
+from .models import Article,TakenCourse
 
 class ArticleForm(forms.ModelForm):
     class Meta:
         model = Article
         fields= ["title","content","article_image"]
 
-
-"""class PollForm(forms.ModelForm):
+"""class TakenCourseForm(forms.ModelForm):
     class Meta:
-        model = Poll
-        fields= ["organization","contribution","course_content","general","feedback"]
+        model = TakenCourse
+        fields = ["title","content","article_image"]
+
 """

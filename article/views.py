@@ -6,8 +6,10 @@ from django.views import View
 import article
 from .forms import ArticleForm
 from django.contrib import messages
-from .models import Article,Comment
+from .models import Article,Comment,TakenCourse
+
 from user.decorators import teacher_required,student_required
+from user.models import Student,User
 
 # Create your views here.
 
@@ -16,16 +18,33 @@ class ArticlesView(View):
         keyword = request.GET.get("keyword")
 
         if keyword:
-            articles = Article.objects.filter(title__contains=keyword)
+            articles = Article.objects.filter(title__icontains=keyword)
             return render(request, "articles.html", {"articles": articles})
 
         articles = Article.objects.all()
 
         return render(request, "articles.html", {"articles": articles})
 
+#----------------------------------------------
+
+class TakenCoursesView(View):
+    def get(self,request,*args,**kwargs):
+        keyword = request.GET.get("keyword")
+        student = get_object_or_404(Student, user_id=request.user.id)
+
+        if keyword:
+            courses = student.courses.filter(student__courses__title__icontains=keyword).distinct()
+            return render(request,"taken-courses.html",{"courses":courses})
+
+        courses = student.courses.all()
+        #courses = TakenCourse.objects.all()
+        return render(request,"taken-courses.html",{"courses":courses})
 
 
-#---------------------------------
+
+
+
+#----------------------------------------------
 class IndexView(View):
     def get(self,request):
         return render(request,"index.html")
@@ -69,7 +88,7 @@ class AddArticleView(View):
     @method_decorator(login_required(login_url="user:login"))
     @method_decorator(teacher_required(login_url="user:loginins"))
     def get(self,request):
-        form = ArticleForm( None)
+        form = ArticleForm(None)
 
         return render(request, "addarticle.html", {"form": form})
 
@@ -151,3 +170,14 @@ class AddCommentView(View):
         newComment.save()
         return redirect(reverse("article:detail", kwargs={"id": id}))
 
+class TakeCourse(View):
+    def get(self,request,id,*args,**kwargs):
+        article = get_object_or_404(Article,id=id)
+        taken_course = TakenCourse()
+        taken_course.student = get_object_or_404(Student,user_id=request.user.id)  #find a way to getting to user especially asn an student
+        #taken_course.student = request.user.student
+        taken_course.article = article
+        taken_course.score = 5
+        taken_course.save()
+
+        return redirect("article:takencourses")
