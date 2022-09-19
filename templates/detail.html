@@ -81,7 +81,8 @@
         <button><a href="{% url "article:take" article.id %}" class="btn btn-danger"> Take Course </a></button>
     {% endif %}
 
-
-
+    {% if request.user.is_student %}
+            <button><a href="{% url "article:drop" article.id %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to drop course?')"> Drop Course </a></button>
+    {% endif %}
 
 {%endblock%}

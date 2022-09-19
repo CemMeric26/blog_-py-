@@ -47,6 +47,8 @@ class TakenCoursesView(View):
 #----------------------------------------------
 class IndexView(View):
     def get(self,request):
+        if request.user.is_teacher:
+            return render(request,"dashboard.html")
         return render(request,"index.html")
 
 #---------------------------------------------
@@ -149,7 +151,7 @@ class DeleteArticleView(View):
     def get(self,request,id):
         article = get_object_or_404(Article, id=id)
         article.delete()
-        messages.success(request, "Course has been deleted succesfully")
+        messages.success(request, "Course has been deleted successfully")
         return redirect("article:dashboard")
 
 
@@ -171,13 +173,38 @@ class AddCommentView(View):
         return redirect(reverse("article:detail", kwargs={"id": id}))
 
 class TakeCourse(View):
+    @method_decorator(login_required(login_url="user:login"))
+    @method_decorator(student_required(login_url="user:loginstu"))
     def get(self,request,id,*args,**kwargs):
         article = get_object_or_404(Article,id=id)
-        taken_course = TakenCourse()
-        taken_course.student = get_object_or_404(Student,user_id=request.user.id)  #find a way to getting to user especially asn an student
-        #taken_course.student = request.user.student
-        taken_course.article = article
-        taken_course.score = 5
-        taken_course.save()
+        student = get_object_or_404(Student,user_id=request.user.id)
+        if article in student.courses.all():
+            messages.warning(request, "You cannot take a course more than once")
+            return redirect("article:takencourses")
 
+
+        taken_course = TakenCourse()
+        taken_course.student = student
+
+        taken_course.article = article
+        taken_course.score = 0
+        taken_course.save()
+        messages.warning(request, "Take course action completed succesfully!!")
+        return redirect("article:takencourses")
+
+
+class DropCourse(View):
+    @method_decorator(login_required(login_url="user:login"))
+    @method_decorator(student_required(login_url="user:loginstu"))
+    def get(self,request,id,*args,**kwargs):
+        article = get_object_or_404(Article, id=id)
+        student = get_object_or_404(Student, user_id=request.user.id)
+        if article in student.courses.all():
+            takencourse = get_object_or_404(TakenCourse,article_id =id)
+            takencourse.delete()
+            messages.success(request, "Course has been dropped succesfully")
+            return redirect("article:takencourses")
+
+
+        messages.warning(request, "You cannot drop a couser that you don't own")
         return redirect("article:takencourses")

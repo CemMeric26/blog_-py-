@@ -13,7 +13,7 @@ class User(AbstractUser):
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, related_name='student')
     courses = models.ManyToManyField(Article,
-                                     through="article.TakenCourse")  # you need to iplemenet through="takencourse"
+                                     through="article.TakenCourse")  # you need to implement through="takencourse"
 
     def __str__(self):
         return self.user.username
