@@ -3,12 +3,69 @@
 {% block body %}
 
 <div class = "jumbotron text-center" >
-    <h3>Welcome to my blog</h3>
+    <h3>Welcome to Moursera</h3>
     <p>
-        This blog will display your articles!
+        This an course application. You can develop yourself in any field. Begin to learn!!!
     </p>
 </div>
+ <br><br><br><br>
+    <h2>Top Rated Courses</h2>
+{%if articles %}
 
+{%for article in articles%}
+{% if article.avg_score %}
+<div class="row">
+    <div class="col-lg-10">
+        <!-- Post content-->
+        <article>
+
+            <!-- Post header-->
+            <header class="mb-4">
+                <!-- Post title-->
+                <a href="/articles/article/{{article.id}}"><h1 class="fw-bolder mb-1">{{article.title}}</h1> </a>
+                <hr>
+                <!-- Post meta content-->
+                <div class="text-muted fst-italic mb-2">Posted on {{article.created_date}} by {{article.author.username}}</div>
+                <!-- Post categories-->
+                <hr>
+            </header>
+            <!-- Preview image figure-->
+            {%if article.article_image %}
+            <a href="/articles/article/{{article.id}}">
+                <figure class="mb-4"><img class="img-fluid rounded" src="{{article.article_image.url}}" alt=""></figure>
+            </a>
+            {%endif%}
+            <!-- Post content-->
+            <section class="mb-5">
+                <p>
+                    {{article.content|safe|truncatewords:25}}
+                </p>
+                <a style="float:right" href="/articles/article/{{article.id}}" class="btn btn-danger"> Read more</a>
+                <br>
+            </section>
+            <p>
+                Course Rating:
+                {% if article.avg_score %}
+                    {{article.avg_score}}
+                {% else %}
+                    Course hasn't been rated by anyone yet...
+                {% endif %}
+
+                </p>
+        </article>
+
+    </div>
+
+</div>
+{% endif %}
+{%endfor%}
+
+{%else%}
+<div class="alert alert-danger"> A course couldn't be found</div>
+{%endif%}
+
+
+<hr>
     {% if request.user.is_authenticated %}
         <div class="alert alert-success" role="alert">
             <h4 class="alert-heading">Well done!</h4>

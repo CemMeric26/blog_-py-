@@ -8,7 +8,7 @@
                 aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <a class="navbar-brand" href="{% url 'index'  %}">My Blog</a>
+        <a class="navbar-brand" href="{% url 'index'  %}">Moursera</a>
 
         <div class="collapse navbar-collapse" id="navbarCollapse">
           <ul class="navbar-nav mr-auto">
@@ -16,30 +16,35 @@
               <a class="nav-link" href="{% url 'about'  %}">About</a>
             </li>
             <li class="nav-item active">
-                <a class="nav-link" href="{% url 'article:articles'  %}">Courses</a>
+                <a class="nav-link" href="{% url 'article:articles'  %}">Available Courses</a>
             </li>
-            <li class="nav-item active">
-                <a class="nav-link" href="{% url 'polls:index'  %}">Polls</a>
-            </li>
+
           </ul>
 
           <ul class="navbar-nav ml-auto">
           {% if request.user.is_authenticated %}
-          <li class="nav-item active">
-            <a class="nav-link" href="{% url 'article:dashboard'  %}">Dashboard</a>
-          </li>
-          <li class="nav-item active">
+              {% if request.user.is_teacher %}
+                  <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'article:dashboard'  %}">My courses</a>
+                </li>
+              {% else %}
+                  <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'article:takencourses' %}">Taken courses</a>
+                </li>
+              {% endif %}
+
+            <li class="nav-item active">
             <a class="nav-link" href="{% url 'user:logout'  %}">Log out</a>
           </li>
           {% else %}
-
-          <li class="nav-item active">
+            <li class="nav-item active">
             <a class="nav-link" href="{% url 'user:login'  %}">Log in</a>
           </li>
-          {% endif %}
-          <li class="nav-item active">
-            <a class="nav-link" href="{% url 'user:register'  %}">Register</a>
+              <li class="nav-item active">
+            <a class="nav-link" href="{% url 'user:signup'  %}">SignUp</a>
           </li>
+          {% endif %}
+
 
           </ul>
         </div>

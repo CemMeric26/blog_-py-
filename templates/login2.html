@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block body %}
+{% load crispy_forms_tags %}
+
+<div class="alert alert-danger" role="alert">
+  You have to be an Instructor for adding courses!
+    Login as Instructor!!!
+</div>
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <h3>Login</h3>
+        <hr>
+        <form method = "post">
+            {% csrf_token %}
+            {{form|crispy}}
+            <br>
+            <button type = "submit" class = "btn btn-danger">Login</button>
+        </form>
+    </div>
+  </div>
+    <div class="alert alert-info" role="alert">
+    If you don't have an Instructor account SignUp from here:
+    <a href="{% url 'user:teacher_signup' %}" class="btn btn-teacher btn-lg" role="button">I'd like to be an Insturctor</a>
+</div>
+
+{% endblock body %}

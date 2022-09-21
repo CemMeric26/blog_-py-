@@ -1,10 +1,12 @@
 from importlib.resources import contents
 from django.db import models
 from ckeditor.fields import RichTextField
+from django.core.validators import MaxValueValidator, MinValueValidator
+#from user.models import User
 # Create your models here.
 
 class Article(models.Model):
-    author = models.ForeignKey("auth.User",on_delete=models.CASCADE,verbose_name="Author")
+    author = models.ForeignKey("user.User",on_delete=models.CASCADE,verbose_name="Author")
     title = models.CharField(max_length=50)
     content = RichTextField()
     created_date = models.DateTimeField(auto_now_add=True)
@@ -27,3 +29,15 @@ class Comment(models.Model):
     class Meta:
         ordering = ['-comment_date']
 
+class TakenCourse(models.Model):
+    student = models.ForeignKey("user.Student", on_delete=models.CASCADE, related_name='taken_courses')
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='taken_courses')
+    score = models.IntegerField(default=0,
+                                validators=[
+                                    MaxValueValidator(5),
+                                    MinValueValidator(0),
+                                ]
+    )   #rating for the taken course
+
+    def __str__(self):
+        return self.article.title
