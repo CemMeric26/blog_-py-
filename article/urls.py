@@ -11,6 +11,7 @@ urlpatterns = [
    path('update/<int:id>',UpdateArticleView.as_view(),name="update"),
    path('delete/<int:id>',DeleteArticleView.as_view(),name="delete"),
    path('comment/<int:id>',AddCommentView.as_view(),name="comment"),
+   path('rate/',RateCourse.as_view(),name="rate"),
    path('vote/<int:id>',FeedBackView.as_view(),name="feedback"),
    path('',ArticlesView.as_view(),name="articles"),
    path('takencourses/',TakenCoursesView.as_view(),name="takencourses"),

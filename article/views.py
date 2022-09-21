@@ -2,6 +2,8 @@ from django.shortcuts import render,HttpResponse,redirect,get_object_or_404,reve
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
+from django.db.models import Avg,Q
+
 
 import article
 from .forms import ArticleForm
@@ -17,28 +19,65 @@ class ArticlesView(View):
     def get(self,request,*args,**kwargs):
         keyword = request.GET.get("keyword")
 
-        if keyword:
-            articles = Article.objects.filter(title__icontains=keyword)
+        #articles = []
+        articles = Article.objects.annotate(avg_score=Avg('taken_courses__score'))
+        if request.user.is_student:
+            student = get_object_or_404(Student, user_id=request.user.id)
+            # a loop to check the courses that are not taken by this student and these courses will be added to articles list
+            for course in Article.objects.all():
+                if course in student.courses.all():
+                    articles = articles.exclude(title__contains=course.title)
+                else:
+                    pass  #articles.append(course)
+
+            #later find a way to filter available courses for student
+            if keyword:
+                articles = articles.filter(title__icontains=keyword)
+                return render(request, "articles.html", {"articles": articles})
+
+
+
             return render(request, "articles.html", {"articles": articles})
 
-        articles = Article.objects.all()
+
+        if keyword:
+            articles = articles.filter(title__icontains=keyword)
+            return render(request, "articles.html", {"articles": articles})
+
+
+        #articles = Article.objects.all()
+
 
         return render(request, "articles.html", {"articles": articles})
 
 #----------------------------------------------
 
 class TakenCoursesView(View):
-    def get(self,request,*args,**kwargs):
+    """def get(self,request,*args,**kwargs):
         keyword = request.GET.get("keyword")
         student = get_object_or_404(Student, user_id=request.user.id)
 
         if keyword:
-            courses = student.courses.filter(student__courses__title__icontains=keyword).distinct()
+            courses = student.courses.filter(Q(student__courses__title__icontains=keyword)) #not working
             return render(request,"taken-courses.html",{"courses":courses})
 
         courses = student.courses.all()
         #courses = TakenCourse.objects.all()
-        return render(request,"taken-courses.html",{"courses":courses})
+        return render(request,"taken-courses.html",{"courses":courses})"""
+
+    def get(self, request, *args, **kwargs):
+        keyword = request.GET.get("keyword")
+        student = get_object_or_404(Student, user_id=request.user.id)
+        courses = student.courses.annotate(avg_score=Avg('taken_courses__score'))
+
+
+        if keyword:
+            courses = courses.filter(title__icontains=keyword)
+            return render(request, "taken-courses.html", {"courses": courses})
+
+
+        return render(request, "taken-courses.html", {"courses": courses})
+
 
 
 
@@ -48,8 +87,16 @@ class TakenCoursesView(View):
 class IndexView(View):
     def get(self,request):
         if request.user.is_teacher:
-            return render(request,"dashboard.html")
-        return render(request,"index.html")
+            articles = Article.objects.filter(author=request.user)
+            context = {
+                "articles": articles
+            }
+            return render(request,"dashboard.html",context)
+
+        articles = Article.objects.annotate(avg_score=Avg('taken_courses__score')).order_by('-avg_score')
+
+
+        return render(request,"index.html",{"articles":articles})
 
 #---------------------------------------------
 
@@ -108,7 +155,7 @@ class AddArticleView(View):
             article.save()
 
             messages.success(request, "Course has been successfully created")
-            return redirect("index")
+            return redirect("article:dashboard")
 
         return render(request, "addarticle.html", {"form": form})
 
@@ -163,14 +210,19 @@ class AddCommentView(View):
     @method_decorator(student_required(login_url="user:loginstu"))
     def post(self,request,id,*args,**kwargs):
         article = get_object_or_404(Article, id=id)
-        comment_author = request.POST.get("comment_author")
-        comment_content = request.POST.get("comment_content")
+        student = get_object_or_404(Student, user_id=request.user.id)
+        if article in student.courses.all():
+            comment_content = request.POST.get("comment_content")
 
-        newComment = Comment(comment_author=comment_author, comment_content=comment_content)
-        newComment.article = article
+            newComment = Comment(comment_author=request.user.username, comment_content=comment_content)
+            newComment.article = article
 
-        newComment.save()
-        return redirect(reverse("article:detail", kwargs={"id": id}))
+            newComment.save()
+            return redirect(reverse("article:detail", kwargs={"id": id}))
+
+
+        messages.warning(request, "You cannot comment on a course that you don't take")
+        return redirect("article:takencourses")
 
 class TakeCourse(View):
     @method_decorator(login_required(login_url="user:login"))
@@ -200,7 +252,7 @@ class DropCourse(View):
         article = get_object_or_404(Article, id=id)
         student = get_object_or_404(Student, user_id=request.user.id)
         if article in student.courses.all():
-            takencourse = get_object_or_404(TakenCourse,article_id =id)
+            takencourse = get_object_or_404(TakenCourse,article_id =id,student_id=request.user.id)
             takencourse.delete()
             messages.success(request, "Course has been dropped succesfully")
             return redirect("article:takencourses")
@@ -208,3 +260,23 @@ class DropCourse(View):
 
         messages.warning(request, "You cannot drop a couser that you don't own")
         return redirect("article:takencourses")
+
+
+class RateCourse(View):
+    @method_decorator(login_required(login_url="user:login"))
+    @method_decorator(student_required(login_url="user:loginstu"))
+    def post(self,request,*args,**kwargs):
+        #print(request.POST)
+        id=request.POST['article_id']
+        article = get_object_or_404(Article, id=id)
+        student = get_object_or_404(Student, user_id=request.user.id)
+        if article in student.courses.all():
+            takencourse = get_object_or_404(TakenCourse,article_id =id,student_id =request.user.id)
+            takencourse.score = request.POST.get('val') # it should be the score that student gave
+            takencourse.save()
+            messages.success(request, "Course has been rated successfully")
+            return redirect(reverse("article:detail", kwargs={"id": id}))
+
+
+
+        return redirect("article:detail")

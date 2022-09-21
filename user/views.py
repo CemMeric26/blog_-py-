@@ -164,6 +164,5 @@ class Logout2View(View):
     def get(self,request):
         logout(request)
         messages.success(request, "Logout successfully")
-
-        return redirect("index")
+        return render(request,"index.html")
 

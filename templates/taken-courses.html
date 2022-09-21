@@ -54,6 +54,17 @@
                 <a style="float:right" href="/articles/article/{{course.id}}" class="btn btn-danger"> Read more</a>
                 <br>
             </section>
+            <p>
+                Your Rating:
+                    {% if course.avg_score %}
+                    {{course.avg_score}}
+                {% else %}
+                    You haven't rated course yet... Rate it!!
+                {% endif %}
+
+
+
+            </p>
 
 
         </article>

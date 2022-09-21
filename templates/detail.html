@@ -1,5 +1,5 @@
 {%extends "layout.html"%}
-
+{% load static %}
 {%block body%}
 
 <div class="row">
@@ -64,7 +64,7 @@
                     {% csrf_token %}
                     <div class="form-group">
                         <label style="padding-left:5px" for="formGroupExampleInput">Name:</label>
-                        <input name = "comment_author" type="text" class="form-control" id="formGroupExampleInput" placeholder="Your name">
+                        <p class="font-weight-bold">@{{ request.user.username }}</p>
                       </div>
                       <div class="form-group">
                         <label style="padding-left:5px" for="formGroupExampleInput">Comment:</label>
@@ -73,16 +73,36 @@
                     <button type="submit" class="btn btn-danger">Add</button>
                 </form>
             </div>
+            <div>
+                <h2>Rate the Course!!</h2>
+                    <div class="row">
+
+            <div class="col text-center">
+                <form class="rate-form" action="{% url 'article:rate' %}" method="POST" id="{{article.id}}">
+                    {% csrf_token %}
+                    <button type="submit" class="fa fa-star fa-3x my-btn" id="first"></button>
+                    <button type="submit" class="fa fa-star fa-3x my-btn" id="second"></button>
+                    <button type="submit" class="fa fa-star fa-3x my-btn" id="third"></button>
+                    <button type="submit" class="fa fa-star fa-3x my-btn" id="fourth"></button>
+                    <button type="submit" class="fa fa-star fa-3x my-btn" id="fifth"></button>
+                </form>
+                <br>
+                <div id="confirm-box"></div>
+            </div>
+
+        </div>
+            </div>
+
         </div>
     </div>                  
 </div>
     <br>
     {% if request.user.is_student %}
         <button><a href="{% url "article:take" article.id %}" class="btn btn-danger"> Take Course </a></button>
+        <button><a href="{% url "article:drop" article.id %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to drop course?')"> Drop Course </a></button>
+
     {% endif %}
 
-    {% if request.user.is_student %}
-            <button><a href="{% url "article:drop" article.id %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to drop course?')"> Drop Course </a></button>
-    {% endif %}
+
 
 {%endblock%}
