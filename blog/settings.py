@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "ckeditor",
     "django_cleanup",
     'django_forms_bootstrap',
+    'embed_video',
 ]
 
 MIDDLEWARE = [

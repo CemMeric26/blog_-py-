@@ -2,6 +2,7 @@ from importlib.resources import contents
 from django.db import models
 from ckeditor.fields import RichTextField
 from django.core.validators import MaxValueValidator, MinValueValidator
+from embed_video.fields import EmbedVideoField
 #from user.models import User
 # Create your models here.
 
@@ -16,6 +17,19 @@ class Article(models.Model):
 
     class Meta:
         ordering = ['-created_date']
+
+
+class Video(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, verbose_name="Article", related_name="videos")
+    title = models.CharField(max_length=100)
+    added = models.DateTimeField(auto_now_add=True)
+    url = EmbedVideoField()
+
+    def __str__(self):
+        return str(self.title)
+
+    class Meta:
+        ordering= ['added']
 
 class Comment(models.Model):
     article = models.ForeignKey(Article,on_delete=models.CASCADE,verbose_name="Article",related_name="comments")

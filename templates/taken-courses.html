@@ -55,9 +55,10 @@
                 <br>
             </section>
             <p>
-                Your Rating:
+                <span class="badge badge-info" >Your Rating</span>
                     {% if course.avg_score %}
-                    {{course.avg_score}}
+                        <span class="badge badge-pill badge-success">{{course.avg_score}}</span>
+
                 {% else %}
                     You haven't rated course yet... Rate it!!
                 {% endif %}
@@ -82,3 +83,4 @@
 
 
 {%endblock body%}
+

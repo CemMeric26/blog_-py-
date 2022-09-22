@@ -55,9 +55,9 @@
                 <br>
             </section>
             <p>
-                Course Rating:
+               <span class="badge badge-info" >Course Rating:</span>
                 {% if article.avg_score %}
-                    {{article.avg_score}}
+                     <span class="badge badge-pill badge-success">{{article.avg_score}}</span>
                 {% else %}
                     Course hasn't been rated by anyone yet...
                 {% endif %}

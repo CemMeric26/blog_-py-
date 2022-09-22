@@ -6,9 +6,9 @@ from django.db.models import Avg,Q
 
 
 import article
-from .forms import ArticleForm
+from .forms import ArticleForm,VideoForm
 from django.contrib import messages
-from .models import Article,Comment,TakenCourse
+from .models import Article,Comment,TakenCourse,Video
 
 from user.decorators import teacher_required,student_required
 from user.models import Student,User
@@ -53,18 +53,6 @@ class ArticlesView(View):
 #----------------------------------------------
 
 class TakenCoursesView(View):
-    """def get(self,request,*args,**kwargs):
-        keyword = request.GET.get("keyword")
-        student = get_object_or_404(Student, user_id=request.user.id)
-
-        if keyword:
-            courses = student.courses.filter(Q(student__courses__title__icontains=keyword)) #not working
-            return render(request,"taken-courses.html",{"courses":courses})
-
-        courses = student.courses.all()
-        #courses = TakenCourse.objects.all()
-        return render(request,"taken-courses.html",{"courses":courses})"""
-
     def get(self, request, *args, **kwargs):
         keyword = request.GET.get("keyword")
         student = get_object_or_404(Student, user_id=request.user.id)
@@ -86,13 +74,13 @@ class TakenCoursesView(View):
 #----------------------------------------------
 class IndexView(View):
     def get(self,request):
-        if request.user.is_teacher:
+        """if request.user.is_teacher:
             articles = Article.objects.filter(author=request.user)
             context = {
                 "articles": articles
             }
             return render(request,"dashboard.html",context)
-
+"""
         articles = Article.objects.annotate(avg_score=Avg('taken_courses__score')).order_by('-avg_score')
 
 
@@ -127,6 +115,45 @@ class DetailView(View):
         comments = article.comments.all()
         return render(request, "detail.html", {"article": article, "comments": comments})
 
+#-------------------------------------------------
+
+class VideosView(View):
+    @method_decorator(login_required(login_url="user:login"))
+    def get(self,request,id):
+        article = get_object_or_404(Article, id=id)
+        videos = article.videos.all()
+        return render(request, "videos.html", {"videos": videos})
+
+
+#-------------------------------------------------
+class AddVideosView(View):
+    @method_decorator(login_required(login_url="user:login"))
+
+    def get(self, request,id):
+        form = VideoForm(None)
+
+        return render(request, "videopage.html", {"form": form})
+
+
+    @method_decorator(login_required(login_url="user:login"))
+
+    def post(self, request,id):
+        form = VideoForm(request.POST or None, request.FILES or None)
+
+        if form.is_valid():
+            video = form.save(commit=False)
+            article = get_object_or_404(Article, id=id)
+            video.title = request.POST.get('title')
+            video.url = request.POST.get('url')
+            video.article = article
+            video.save()
+
+            messages.success(request, "Course has been successfully created")
+            return redirect("article:dashboard")
+
+        return render(request, "videopage.html", {"form": form})
+
+#----------------------------------------------
 
 
 #-------------------------------------------------

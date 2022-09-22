@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% load embed_video_tags %}
+
+{% block body %}
+
+    <h1 class="mb-5">Course Videos</h1>
+    <div class="d-flex flex-wrap">
+        {% for video in videos %}
+        <div class="px-3 mb-5">
+            <div class="d-flex justify justify-content-start">
+                <h5 >{{ video.title }} </h5>
+            </div>
+            {% video video.url '426x240' %}
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+
+{% endblock %}
