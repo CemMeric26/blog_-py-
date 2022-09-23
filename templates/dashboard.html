@@ -44,7 +44,7 @@ SO I USED IT
             <td><a href="/articles/article/{{article.id}}">{{article.title}}</a></td>
             <td>{{article.author.username}}</td>
             <td>{{article.created_date}}</td>
-            <td><a href="{%url 'article:addvideos' article.id %}" class="btn btn-danger"> Add videos </a></td> <!-- fix url-->
+            <td><a href="{%url 'article:addvideos' article.id %}" class="btn btn-danger"> Add lessons </a></td> <!-- fix url-->
             <td><a href="{%url 'article:update' article.id %}" class="btn btn-danger"> Update </a></td>
             <td><a href="{%url 'article:delete' article.id %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this?')"> Delete </a></td>
 

@@ -9,7 +9,7 @@ class ArticleForm(forms.ModelForm):
 class VideoForm(forms.ModelForm):
     class Meta:
         model = Video
-        fields = ["title","url"]
+        fields = ["title","url","video_id"]
 
 """class TakenCourseForm(forms.ModelForm):
     class Meta:

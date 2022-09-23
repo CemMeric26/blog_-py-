@@ -4,7 +4,6 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.db.models import Avg,Q
 
-
 import article
 from .forms import ArticleForm,VideoForm
 from django.contrib import messages
@@ -13,7 +12,13 @@ from .models import Article,Comment,TakenCourse,Video
 from user.decorators import teacher_required,student_required
 from user.models import Student,User
 
+import json
+import urllib.request
+
 # Create your views here.
+API_KEY ="AIzaSyDuTuqB9Xv5aocjJy4KfxkXUV3vIkU6AGs"
+
+
 
 class ArticlesView(View):
     def get(self,request,*args,**kwargs):
@@ -145,6 +150,18 @@ class AddVideosView(View):
             article = get_object_or_404(Article, id=id)
             video.title = request.POST.get('title')
             video.url = request.POST.get('url')
+            video_id = request.POST.get('video_id')
+            video.video_id = video_id
+
+
+            #calculation of the video duration
+            total_second= duration_calc(video_id)
+
+
+            video.duration = total_second
+            min = total_second // 60
+            sec = total_second % 60
+            video.duration_str = str(min)+'m ' + str(sec) + 's '
             video.article = article
             video.save()
 
@@ -155,6 +172,25 @@ class AddVideosView(View):
 
 #----------------------------------------------
 
+# a function to calculate duration of the video
+def duration_calc(video_id):
+    video_id = video_id
+    api_key = API_KEY
+    searchUrl = "https://www.googleapis.com/youtube/v3/videos?id=" + video_id + "&key=" + api_key + "&part=contentDetails"
+    response = urllib.request.urlopen(searchUrl).read()
+    data = json.loads(response)
+    all_data = data['items']
+    contentDetails = all_data[0]['contentDetails']
+    duration = contentDetails['duration']
+    new_dur = duration.split('PT')[1].split('M')
+    min = float(new_dur[0])
+    sec = new_dur[1].split('S')[0]
+    if(sec != ''):
+        sec = float(sec)
+    else:
+        sec = 0
+
+    return min*60 + sec
 
 #-------------------------------------------------
 

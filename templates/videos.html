@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% load embed_video_tags %}
 
+
 {% block body %}
 
     <h1 class="mb-5">Course Videos</h1>
@@ -8,15 +9,27 @@
         {% for video in videos %}
         <div class="px-3 mb-5">
             <div class="d-flex justify justify-content-start">
-                <h5 >{{ video.title }} </h5>
+
+                <h5 > <strong>{{ forloop.counter }}. Lesson:  <h5> {{ video.title }} </h5> </strong> </h5>
+
             </div>
             {% video video.url '426x240' %}
 
+            <h6> Course duration: <span class="badge badge-pill badge-success">{{ video.duration_str }}</span> <span class="badge badge-pill badge-success">{{ video.duration }}<span> seconds </h6>
+            <input type="checkbox" id="defaultCheck" name="example2">
+            <label for="defaultCheck">Completed Lesson</label>
         </div>
+
+
+
+
+
 
     </div>
 
+
     {% endfor %}
+
 
 
 {% endblock %}
