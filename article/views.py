@@ -2,12 +2,12 @@ from django.shortcuts import render,HttpResponse,redirect,get_object_or_404,reve
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.db.models import Avg,Q
+from django.db.models import Avg,Q,Sum
 
 import article
 from .forms import ArticleForm,VideoForm
 from django.contrib import messages
-from .models import Article,Comment,TakenCourse,Video
+from .models import Article,Comment,TakenCourse,Video,TakenCourseVideo
 
 from user.decorators import teacher_required,student_required
 from user.models import Student,User
@@ -24,18 +24,21 @@ class ArticlesView(View):
     def get(self,request,*args,**kwargs):
         keyword = request.GET.get("keyword")
 
-        #articles = []
-        articles = Article.objects.annotate(avg_score=Avg('taken_courses__score'))
+
+        articles = Article.objects.annotate(avg_score=Avg('taken_courses__score'),duration_sum=Sum('videos__duration'))
+
+
         if request.user.is_student:
             student = get_object_or_404(Student, user_id=request.user.id)
+
             # a loop to check the courses that are not taken by this student and these courses will be added to articles list
             for course in Article.objects.all():
                 if course in student.courses.all():
                     articles = articles.exclude(title__contains=course.title)
                 else:
-                    pass  #articles.append(course)
+                    pass
 
-            #later find a way to filter available courses for student
+
             if keyword:
                 articles = articles.filter(title__icontains=keyword)
                 return render(request, "articles.html", {"articles": articles})
@@ -54,6 +57,17 @@ class ArticlesView(View):
 
 
         return render(request, "articles.html", {"articles": articles})
+
+
+
+# a function to convert courses' total duration to a string Ex: 15000 seconds => 10 mins 45 secons
+"""def duration_to_string(time_dur):
+    hour = time_dur // 3600
+    time_dur %= 3600
+    minutes = time_dur // 60
+    time_dur %= 60
+    seconds = time_dur
+    return (hour, minutes, seconds)"""
 
 #----------------------------------------------
 
@@ -86,6 +100,7 @@ class IndexView(View):
             }
             return render(request,"dashboard.html",context)
 """
+
         articles = Article.objects.annotate(avg_score=Avg('taken_courses__score')).order_by('-avg_score')
 
 
@@ -117,6 +132,12 @@ class DetailView(View):
     @method_decorator(login_required(login_url="user:login"))
     def get(self,request,id):
         article = get_object_or_404(Article, id=id)
+
+        """if request.user.is_student:
+            takencourse = get_object_or_404(TakenCourse,article_id=id,student_id=request.user.id)
+"""
+
+
         comments = article.comments.all()
         return render(request, "detail.html", {"article": article, "comments": comments})
 
@@ -304,6 +325,15 @@ class TakeCourse(View):
         taken_course.article = article
         taken_course.score = 0
         taken_course.save()
+
+        # creation of taken courses' videos for the student
+        if article.videos.all():
+            for video in article.videos.all():
+                taken_course_video = TakenCourseVideo(takencourse_id=taken_course.id,video_id=video.id)
+                taken_course_video.save()
+
+
+
         messages.warning(request, "Take course action completed succesfully!!")
         return redirect("article:takencourses")
 
@@ -343,3 +373,23 @@ class RateCourse(View):
 
 
         return redirect("article:detail")
+
+class CompleteVideo(View):
+    @method_decorator(login_required(login_url="user:login"))
+    @method_decorator(student_required(login_url="user:loginstu"))
+    def post(self,request,*args,**kwargs):
+        video_id = request.POST.get('video_id')
+        video =get_object_or_404(Video,id=video_id)
+        id = video.article_id
+        takencourse = get_object_or_404(TakenCourse, article_id=id, student_id=request.user.id)
+
+        #toggling video is watched or not for the takencoruses' videos
+        takenvideo = get_object_or_404(TakenCourseVideo,takencourse_id=takencourse.id,video_id=video_id)
+        takenvideo.is_completed_video = not (takenvideo.is_completed_video)
+        takenvideo.save()
+
+
+        return redirect(reverse("article:videos", kwargs={"id": id}))
+
+
+

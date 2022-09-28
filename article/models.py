@@ -27,7 +27,7 @@ class Video(models.Model):
     url = EmbedVideoField()
     duration = models.FloatField(default=0)
     duration_str = models.CharField(max_length=25)
-    is_completed_video = models.BooleanField(default=False)
+
 
     def __str__(self):
         return str(self.title)
@@ -50,7 +50,8 @@ class Comment(models.Model):
 class TakenCourse(models.Model):
     student = models.ForeignKey("user.Student", on_delete=models.CASCADE, related_name='taken_courses')
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='taken_courses')
-    score = models.IntegerField(default=0,
+    is_takencourse_completed = models.FloatField(default=0)
+    score = models.IntegerField(null=True,
                                 validators=[
                                     MaxValueValidator(5),
                                     MinValueValidator(0),
@@ -59,3 +60,11 @@ class TakenCourse(models.Model):
 
     def __str__(self):
         return self.article.title
+
+class TakenCourseVideo(models.Model):
+    takencourse = models.ForeignKey(TakenCourse,on_delete=models.CASCADE)
+    video = models.ForeignKey(Video,on_delete=models.CASCADE)
+    is_completed_video = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.video.title

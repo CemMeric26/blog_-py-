@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Article,Comment,TakenCourse,Video
+from .models import Article,Comment,TakenCourse,Video,TakenCourseVideo
 from polls.models import Poll
 # Register your models here.
 
@@ -8,6 +8,7 @@ admin.site.register(Comment)
 admin.site.register(Poll)
 admin.site.register(TakenCourse)
 admin.site.register(Video)
+admin.site.register(TakenCourseVideo)
 #admin.site.register(Question)
 
 @admin.register(Article)

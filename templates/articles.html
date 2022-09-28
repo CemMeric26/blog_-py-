@@ -63,6 +63,15 @@
                 {% endif %}
 
                 </p>
+                <p>
+                   <span class="badge badge-info" >Course Length:</span>
+                    {% if article.duration_sum %}
+                         <span class="badge badge-pill badge-success">{{article.duration_sum}} seconds</span>
+                    {% else %}
+                        ...
+                    {% endif %}
+
+                </p>
         </article>
         
     </div>
@@ -74,7 +83,6 @@
 {%else%}
 <div class="alert alert-danger"> A course couldn't be found</div>
 {%endif%}
-
 
 
 {%endblock body%}

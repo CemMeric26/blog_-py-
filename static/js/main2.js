@@ -1,3 +1,6 @@
+
+
+
 const one = document.getElementById('first')
 const two = document.getElementById('second')
 const three = document.getElementById('third')
@@ -7,6 +10,10 @@ const five = document.getElementById('fifth')
 const form = document.querySelector('.rate-form')
 const confirmBox = document.getElementById('confirm-box')
 const csrf = document.getElementsByName('csrfmiddlewaretoken')
+
+const complete_form = document.querySelector('.complete-form')
+const comp = document.getElementById('complete')
+
 
 const handleStar = (len) => {
     const children = form.children
@@ -116,3 +123,7 @@ if (one) {
         })
     }))
 }
+
+
+
+
