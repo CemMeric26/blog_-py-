@@ -33,25 +33,25 @@
             <!-- Post header-->
             <header class="mb-4">
                 <!-- Post title-->
-                <a href="/articles/article/{{course.id}}"><h1 class="fw-bolder mb-1">{{course.title}}</h1> </a>
+                <a href="/articles/article/{{course.article.id}}"><h1 class="fw-bolder mb-1">{{course.article.title}}</h1> </a>
                 <hr>
                 <!-- Post meta content-->
-                <div class="text-muted fst-italic mb-2">Posted on {{course.created_date}} by {{course.author.username}}</div>
+                <div class="text-muted fst-italic mb-2">Posted on {{course.article.created_date}} by {{course.article.author.username}}</div>
                 <!-- Post categories-->
                 <hr>
             </header>
             <!-- Preview image figure-->
-            {%if course.article_image %}
-            <a href="/articles/article/{{course.id}}">
-                <figure class="mb-4"><img class="img-fluid rounded" src="{{course.article_image.url}}" alt=""></figure>
+            {%if course.article.article_image %}
+            <a href="/articles/article/{{course.article.id}}">
+                <figure class="mb-4"><img class="img-fluid rounded" src="{{course.article.article_image.url}}" alt=""></figure>
             </a>
             {%endif%}
             <!-- Post content-->
             <section class="mb-5">
                 <p>
-                    {{course.content|safe|truncatewords:25}}
+                    {{course.article.content|safe|truncatewords:25}}
                 </p>
-                <a style="float:right" href="/articles/article/{{course.id}}" class="btn btn-danger"> Read more</a>
+                <a style="float:right" href="/articles/article/{{course.article.id}}" class="btn btn-danger"> Read more</a>
                 <br>
             </section>
             <p>
@@ -63,10 +63,17 @@
                     You haven't rated course yet... Rate it!!
                 {% endif %}
 
+            </p>
+            <p>
+                <span class="badge badge-info" >Completed percentage</span>
+                    {% if course.is_takencourse_completed %}
+                        <span class="badge badge-pill badge-success"> %{{course.is_takencourse_completed}}</span>
 
+                {% else %}
+                    You haven't started to course yet
+                {% endif %}
 
             </p>
-
 
         </article>
 

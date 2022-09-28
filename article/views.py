@@ -75,7 +75,22 @@ class TakenCoursesView(View):
     def get(self, request, *args, **kwargs):
         keyword = request.GET.get("keyword")
         student = get_object_or_404(Student, user_id=request.user.id)
-        courses = student.courses.annotate(avg_score=Avg('taken_courses__score'))
+        courses = TakenCourse.objects.filter(student_id=student.user_id).annotate(avg_score=Avg('score'))
+
+        #courses = student.courses.annotate(avg_score=Avg('taken_courses__score'))
+
+
+        for course in courses:
+            #takencourse = get_object_or_404(TakenCourse,article_id=course.id,student_id=request.user.id)
+            #takencourse_videos = TakenCourseVideo.objects.filter(takencourse_id=takencourse.id)
+
+            takencourse_videos = TakenCourseVideo.objects.filter(takencourse_id=course.id)
+            completed = 0 #number of completed videos
+            for video in takencourse_videos:
+                if video.is_completed_video:
+                    completed = completed+1
+
+            course.is_takencourse_completed = (completed/len(takencourse_videos))*100
 
 
         if keyword:
@@ -132,13 +147,26 @@ class DetailView(View):
     @method_decorator(login_required(login_url="user:login"))
     def get(self,request,id):
         article = get_object_or_404(Article, id=id)
+        comments = article.comments.all()
 
         """if request.user.is_student:
-            takencourse = get_object_or_404(TakenCourse,article_id=id,student_id=request.user.id)
+            student = get_object_or_404(Student,user_id=request.user.id)
+            if article in student.courses.all():
+                takencourse = get_object_or_404(TakenCourse,article_id=id,student_id=request.user.id)
+                takencourse_videos = TakenCourseVideo.objects.filter(takencourse_id=takencourse.id)
+
+                completed = 0 #number of completed videos
+                for video in takencourse_videos:
+                    if video.is_completed_video:
+                        completed = completed+1
+
+                takencourse.is_takencourse_completed = completed/len(takencourse_videos)
 """
 
 
-        comments = article.comments.all()
+
+
+
         return render(request, "detail.html", {"article": article, "comments": comments})
 
 #-------------------------------------------------
