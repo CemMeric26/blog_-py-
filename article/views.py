@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.db.models import Avg,Q,Sum
+from django.core.paginator import Paginator
 
 import article
 from .forms import ArticleForm,VideoForm
@@ -14,6 +15,7 @@ from user.models import Student,User
 
 import json
 import urllib.request
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 API_KEY ="AIzaSyDuTuqB9Xv5aocjJy4KfxkXUV3vIkU6AGs"
@@ -26,6 +28,7 @@ class ArticlesView(View):
 
 
         articles = Article.objects.annotate(avg_score=Avg('taken_courses__score'),duration_sum=Sum('videos__duration'))
+
 
 
         if request.user.is_student:
@@ -43,20 +46,24 @@ class ArticlesView(View):
                 articles = articles.filter(title__icontains=keyword)
                 return render(request, "articles.html", {"articles": articles})
 
+            paginator = Paginator(articles, 3)
+            page_number = request.GET.get('page')
+            page_obj = paginator.get_page(page_number)
 
+            return render(request, "articles.html", {"page_obj": page_obj})
 
-            return render(request, "articles.html", {"articles": articles})
-
-
+        paginator = Paginator(articles, 3)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
         if keyword:
             articles = articles.filter(title__icontains=keyword)
-            return render(request, "articles.html", {"articles": articles})
+            return render(request, "articles.html", {"page_obj": page_obj})
 
 
         #articles = Article.objects.all()
 
 
-        return render(request, "articles.html", {"articles": articles})
+        return render(request, "articles.html", {"page_obj": page_obj})
 
 
 
@@ -75,15 +82,10 @@ class TakenCoursesView(View):
     def get(self, request, *args, **kwargs):
         keyword = request.GET.get("keyword")
         student = get_object_or_404(Student, user_id=request.user.id)
-        courses = TakenCourse.objects.filter(student_id=student.user_id).annotate(avg_score=Avg('score'))
-
-        #courses = student.courses.annotate(avg_score=Avg('taken_courses__score'))
+        courses = TakenCourse.objects.filter(student_id=student.user_id).annotate(avg_score=Avg('score')).order_by('added')
 
 
         for course in courses:
-            #takencourse = get_object_or_404(TakenCourse,article_id=course.id,student_id=request.user.id)
-            #takencourse_videos = TakenCourseVideo.objects.filter(takencourse_id=takencourse.id)
-
             takencourse_videos = TakenCourseVideo.objects.filter(takencourse_id=course.id)
             completed = 0 #number of completed videos
             for video in takencourse_videos:
@@ -93,12 +95,20 @@ class TakenCoursesView(View):
             course.is_takencourse_completed = (completed/len(takencourse_videos))*100
 
 
+
         if keyword:
             courses = courses.filter(title__icontains=keyword)
-            return render(request, "taken-courses.html", {"courses": courses})
 
+            paginator = Paginator(courses, 3)
+            page_number = request.GET.get('page')
+            page_obj = paginator.get_page(page_number)
+            return render(request, "taken-courses.html", {"page_obj": page_obj})
 
-        return render(request, "taken-courses.html", {"courses": courses})
+        paginator = Paginator(courses, 3)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        return render(request, "taken-courses.html", {"page_obj": page_obj})
 
 
 
@@ -108,18 +118,15 @@ class TakenCoursesView(View):
 #----------------------------------------------
 class IndexView(View):
     def get(self,request):
-        """if request.user.is_teacher:
-            articles = Article.objects.filter(author=request.user)
-            context = {
-                "articles": articles
-            }
-            return render(request,"dashboard.html",context)
-"""
 
         articles = Article.objects.annotate(avg_score=Avg('taken_courses__score')).order_by('-avg_score')
 
+        paginator = Paginator(articles, 3)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
 
-        return render(request,"index.html",{"articles":articles})
+
+        return render(request,"index.html",{"page_obj":page_obj})
 
 #---------------------------------------------
 
@@ -134,11 +141,12 @@ class DashboardView(View):
     @method_decorator(login_required(login_url="user:login"))
     def get(self,request):
         articles = Article.objects.filter(author=request.user)
-        context = {
-            "articles": articles
-        }
 
-        return render(request, "dashboard.html", context)
+        paginator = Paginator(articles, 3)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        return render(request, "dashboard.html", {'page_obj':page_obj})
 
 
 
@@ -148,23 +156,6 @@ class DetailView(View):
     def get(self,request,id):
         article = get_object_or_404(Article, id=id)
         comments = article.comments.all()
-
-        """if request.user.is_student:
-            student = get_object_or_404(Student,user_id=request.user.id)
-            if article in student.courses.all():
-                takencourse = get_object_or_404(TakenCourse,article_id=id,student_id=request.user.id)
-                takencourse_videos = TakenCourseVideo.objects.filter(takencourse_id=takencourse.id)
-
-                completed = 0 #number of completed videos
-                for video in takencourse_videos:
-                    if video.is_completed_video:
-                        completed = completed+1
-
-                takencourse.is_takencourse_completed = completed/len(takencourse_videos)
-"""
-
-
-
 
 
         return render(request, "detail.html", {"article": article, "comments": comments})
@@ -241,12 +232,14 @@ def duration_calc(video_id):
 
     return min*60 + sec
 
+
+
 #-------------------------------------------------
 
 
-class AddArticleView(View):
+class AddArticleView(LoginRequiredMixin,View):
 
-    @method_decorator(login_required(login_url="user:login"))
+    #@method_decorator(login_required(login_url="user:login"))
     @method_decorator(teacher_required(login_url="user:loginins"))
     def get(self,request):
         form = ArticleForm(None)
@@ -255,7 +248,6 @@ class AddArticleView(View):
 
 
     #@method_decorator(login_required(login_url="user:login"))
-    @method_decorator(login_required(login_url="user:login"))
     @method_decorator(teacher_required(login_url="user:loginins"))
     def post(self, request):
         form = ArticleForm(request.POST or None, request.FILES or None)

@@ -115,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'user.User'
 
-#LOGIN_URL = 'login'
+LOGIN_URL = '/user/login/'
 
 #LOGOUT_URL = 'logout'
 

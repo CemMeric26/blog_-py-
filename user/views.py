@@ -78,7 +78,7 @@ class Login2View(View):
         return render(request, "login.html",context)
     def post(self,request):
         form = LoginForm(request.POST or None)
-        print(request.POST)
+
         context = {
             "form": form
         }

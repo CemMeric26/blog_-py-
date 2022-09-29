@@ -23,7 +23,7 @@ SO I USED IT
 
 -->
 <hr>
-{%if articles%}
+{%if page_obj%}
 <table class="table table-striped">
     <thead>
       <tr>
@@ -38,7 +38,7 @@ SO I USED IT
       </tr>
     </thead>
     <tbody>
-        {%for article in articles%}
+        {%for article in page_obj%}
         <tr>
             <th scope="row">{{article.id}}</th>
             <td><a href="/articles/article/{{article.id}}">{{article.title}}</a></td>
@@ -51,8 +51,50 @@ SO I USED IT
           </tr>
 
         {%endfor%}
+
     </tbody>
+
   </table>
+    <br>
+<div class="pagination">
+    <span class="step-links">
+    <span class="badge badge-warning" >
+           {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+
+        {% endif %}
+    </span>
+    <span class="badge badge-info" >
+           {% if page_obj.has_previous %}
+
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+    </span>
+
+        <span class="current">
+            <span class="badge badge-success" >
+                <strong>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}. </strong>
+            </span>
+
+        </span>
+        <span class="badge badge-info" >
+           {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+
+        {% endif %}
+
+        </span>
+        <span class="badge badge-warning" >
+           {% if page_obj.has_next %}
+
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+
+        </span>
+
+
+    </span>
+</div>
 {%else%}
 
 <div class="alert alert-danger">
@@ -61,7 +103,9 @@ SO I USED IT
 
 </div>
 
+
 {%endif%}
+
 
 
     <div class="alert alert-success" role="alert">

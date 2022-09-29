@@ -51,13 +51,15 @@ class TakenCourse(models.Model):
     student = models.ForeignKey("user.Student", on_delete=models.CASCADE, related_name='taken_courses')
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='taken_courses')
     is_takencourse_completed = models.FloatField(default=0)
+    added = models.DateTimeField(auto_now_add=True)
     score = models.IntegerField(null=True,
                                 validators=[
                                     MaxValueValidator(5),
                                     MinValueValidator(0),
                                 ]
     )   #rating for the taken course
-
+    class Meta:
+        ordering = ['added']
     def __str__(self):
         return self.article.title
 
