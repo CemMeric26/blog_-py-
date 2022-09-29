@@ -87,7 +87,7 @@ class Login2View(View):
             username = form.cleaned_data.get("username")
             password = form.cleaned_data.get("password")
             user = authenticate(username=username, password=password)
-
+            print(user)
             if user is None:
                 messages.info(request, "Username or password is wrong")
                 return render(request, "login.html", context)

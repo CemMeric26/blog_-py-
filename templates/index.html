@@ -10,9 +10,9 @@
 </div>
  <br><br><br><br>
     <h2>Top Rated Courses</h2>
-{%if articles %}
 
-{%for article in articles%}
+
+{%for article in page_obj%}
 {% if article.avg_score %}
 <div class="row">
     <div class="col-lg-10">
@@ -44,9 +44,9 @@
                 <br>
             </section>
             <p>
-                Course Rating:
+               <span class="badge badge-info" >Course Rating:</span>
                 {% if article.avg_score %}
-                    {{article.avg_score}}
+                   <span class="badge badge-pill badge-success">{{article.avg_score}}</span>
                 {% else %}
                     Course hasn't been rated by anyone yet...
                 {% endif %}
@@ -59,12 +59,48 @@
 </div>
 {% endif %}
 {%endfor%}
+<br>
+<div class="pagination">
+    <span class="step-links">
+    <span class="badge badge-warning" >
+           {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
 
-{%else%}
-<div class="alert alert-danger"> A course couldn't be found</div>
-{%endif%}
+        {% endif %}
+    </span>
+    <span class="badge badge-info" >
+           {% if page_obj.has_previous %}
+
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+    </span>
+
+        <span class="current">
+            <span class="badge badge-success" >
+                <strong>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}. </strong>
+            </span>
+
+        </span>
+        <span class="badge badge-info" >
+           {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+
+        {% endif %}
+
+        </span>
+        <span class="badge badge-warning" >
+           {% if page_obj.has_next %}
+
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+
+        </span>
 
 
+    </span>
+</div>
+
+<br>
 <hr>
     {% if request.user.is_authenticated %}
         <div class="alert alert-success" role="alert">

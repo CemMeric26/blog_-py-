@@ -23,7 +23,7 @@ SO I USED IT
 
 -->
 <hr>
-{%if articles%}
+{%if page_obj%}
 <table class="table table-striped">
     <thead>
       <tr>
@@ -31,28 +31,70 @@ SO I USED IT
         <th scope="col">Title</th>
         <th scope="col">Author</th>
         <th scope="col">Date</th>
-        <th scope="col">Vote</th>
+        <th scope="col">Add videos</th>
         <th scope="col">Update</th>
         <th scope="col">Delete</th>
 
       </tr>
     </thead>
     <tbody>
-        {%for article in articles%}
+        {%for article in page_obj%}
         <tr>
             <th scope="row">{{article.id}}</th>
             <td><a href="/articles/article/{{article.id}}">{{article.title}}</a></td>
             <td>{{article.author.username}}</td>
             <td>{{article.created_date}}</td>
-            <td><a href="/articles/vote/{{ article.id }}" class="btn btn-danger"> Vote </a></td>
-            <td><a href="/articles/update/{{article.id}}" class="btn btn-danger"> Update </a></td>
-            <td><a href="/articles/delete/{{article.id}}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this?')"> Delete </a></td>
+            <td><a href="{%url 'article:addvideos' article.id %}" class="btn btn-danger"> Add lessons </a></td> <!-- fix url-->
+            <td><a href="{%url 'article:update' article.id %}" class="btn btn-danger"> Update </a></td>
+            <td><a href="{%url 'article:delete' article.id %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this?')"> Delete </a></td>
 
           </tr>
 
         {%endfor%}
+
     </tbody>
+
   </table>
+    <br>
+<div class="pagination">
+    <span class="step-links">
+    <span class="badge badge-warning" >
+           {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+
+        {% endif %}
+    </span>
+    <span class="badge badge-info" >
+           {% if page_obj.has_previous %}
+
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+    </span>
+
+        <span class="current">
+            <span class="badge badge-success" >
+                <strong>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}. </strong>
+            </span>
+
+        </span>
+        <span class="badge badge-info" >
+           {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+
+        {% endif %}
+
+        </span>
+        <span class="badge badge-warning" >
+           {% if page_obj.has_next %}
+
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+
+        </span>
+
+
+    </span>
+</div>
 {%else%}
 
 <div class="alert alert-danger">
@@ -61,7 +103,9 @@ SO I USED IT
 
 </div>
 
+
 {%endif%}
+
 
 
     <div class="alert alert-success" role="alert">

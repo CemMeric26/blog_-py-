@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+{% load embed_video_tags %}
+
+
+{% block body %}
+
+    <h1 class="mb-5">Course Videos</h1>
+    <div class="d-flex flex-wrap">
+        {% for video in videos %}
+        <div class="px-3 mb-5">
+            <div class="d-flex justify justify-content-start">
+
+                <h5 > <strong>{{ forloop.counter }}. Lesson:  <h5> {{ video.title }} </h5> </strong> </h5>
+
+            </div>
+            {% video video.url '426x240' %}
+
+            <h6> Course duration: <span class="badge badge-pill badge-success">{{ video.duration_str }}</span> <span class="badge badge-pill badge-success">{{ video.duration }}<span> seconds </h6>
+
+
+            <input onclick="completeVideo({{ video.id }})" type="checkbox" class="form-check-input" id="complete"><label for="complete">Complete video </label>
+                    <br>
+
+
+        </div>
+
+
+    </div>
+
+
+    {% endfor %}
+
+
+<script>
+
+
+
+const completeVideo = (id) =>{
+    $.ajax({
+                type: 'POST',
+                url: "{% url 'article:complete' %}",
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'video_id': id,
+
+                },
+                success: function(response){
+                    //console.log(response)
+                    //confirmBox.innerHTML = `<h6>Successfully toggled video as completed</h6>`
+                },
+                error: function(error){
+                    //console.log(error)
+                    //confirmBox.innerHTML = '<h6>Ups... something went wrong</h6>'
+                }
+            })}
+
+</script>
+
+
+{% endblock %}
