@@ -117,7 +117,7 @@ if (one) {
                 },
                 error: function(error){
                     console.log(error)
-                    confirmBox.innerHTML = '<h1>Ups... something went wrong</h1>'
+                    confirmBox.innerHTML = '<h1>Ups... something went wrong!</h1>'
                 }
             })
         })

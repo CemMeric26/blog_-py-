@@ -2,7 +2,7 @@ from django.shortcuts import render,HttpResponse,redirect,get_object_or_404,reve
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.db.models import Avg,Q,Sum
+from django.db.models import Avg,F,Sum
 from django.core.paginator import Paginator
 
 import article
@@ -44,7 +44,10 @@ class ArticlesView(View):
 
             if keyword:
                 articles = articles.filter(title__icontains=keyword)
-                return render(request, "articles.html", {"articles": articles})
+                paginator = Paginator(articles, 3)
+                page_number = request.GET.get('page')
+                page_obj = paginator.get_page(page_number)
+                return render(request, "articles.html", {"page_obj": page_obj})
 
             paginator = Paginator(articles, 3)
             page_number = request.GET.get('page')
@@ -52,29 +55,24 @@ class ArticlesView(View):
 
             return render(request, "articles.html", {"page_obj": page_obj})
 
+
+        if keyword:
+            articles = articles.filter(title__icontains=keyword)
+            paginator = Paginator(articles, 3)
+            page_number = request.GET.get('page')
+            page_obj = paginator.get_page(page_number)
+            return render(request, "articles.html", {"page_obj": page_obj})
+
         paginator = Paginator(articles, 3)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
-        if keyword:
-            articles = articles.filter(title__icontains=keyword)
-            return render(request, "articles.html", {"page_obj": page_obj})
-
-
-        #articles = Article.objects.all()
 
 
         return render(request, "articles.html", {"page_obj": page_obj})
 
 
 
-# a function to convert courses' total duration to a string Ex: 15000 seconds => 10 mins 45 secons
-"""def duration_to_string(time_dur):
-    hour = time_dur // 3600
-    time_dur %= 3600
-    minutes = time_dur // 60
-    time_dur %= 60
-    seconds = time_dur
-    return (hour, minutes, seconds)"""
+
 
 #----------------------------------------------
 
@@ -92,12 +90,13 @@ class TakenCoursesView(View):
                 if video.is_completed_video:
                     completed = completed+1
 
-            course.is_takencourse_completed = (completed/len(takencourse_videos))*100
+            if completed:
+                course.is_takencourse_completed = (completed/len(takencourse_videos))*100
 
 
 
         if keyword:
-            courses = courses.filter(title__icontains=keyword)
+            courses = courses.filter(article__title__icontains=keyword)
 
             paginator = Paginator(courses, 3)
             page_number = request.GET.get('page')
@@ -119,11 +118,12 @@ class TakenCoursesView(View):
 class IndexView(View):
     def get(self,request):
 
-        articles = Article.objects.annotate(avg_score=Avg('taken_courses__score')).order_by('-avg_score')
+        articles = Article.objects.annotate(avg_score=Avg('taken_courses__score')).order_by(F('avg_score').desc(nulls_last=True))
 
         paginator = Paginator(articles, 3)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
+
 
 
         return render(request,"index.html",{"page_obj":page_obj})
@@ -156,9 +156,14 @@ class DetailView(View):
     def get(self,request,id):
         article = get_object_or_404(Article, id=id)
         comments = article.comments.all()
+        flag=False
+        if request.user.is_student:
+            student = get_object_or_404(Student, user_id=request.user.id)
+            if article in student.courses.all():
+                flag=True
 
 
-        return render(request, "detail.html", {"article": article, "comments": comments})
+        return render(request, "detail.html", {"article": article, "comments": comments,"flag":flag})
 
 #-------------------------------------------------
 
@@ -167,7 +172,20 @@ class VideosView(View):
     def get(self,request,id):
         article = get_object_or_404(Article, id=id)
         videos = article.videos.all()
-        return render(request, "videos.html", {"videos": videos})
+        flag = False
+        if request.user.is_student:
+            student = get_object_or_404(Student, user_id=request.user.id)
+            if article in student.courses.all():
+                flag = True
+                takencourse = get_object_or_404(TakenCourse, article_id=id, student_id=request.user.id)
+                takenvideos =TakenCourseVideo.objects.filter(takencourse_id=takencourse.id)
+
+                return render(request,"takenvideos.html",{"takenvideos":takenvideos,"flag":flag})
+
+
+
+
+        return render(request, "videos.html", {"videos": videos,"flag":flag})
 
 
 #-------------------------------------------------
@@ -315,7 +333,23 @@ class AddCommentView(View):
     def post(self,request,id,*args,**kwargs):
         article = get_object_or_404(Article, id=id)
         student = get_object_or_404(Student, user_id=request.user.id)
+        #comments= article.comments.filter(parent__isnull=True)
+
         if article in student.courses.all():
+            parent_obj = None
+            try:
+                parent_id= int(request.POST.get('parent_id'))
+            except:
+                parent_id = None
+            if parent_id:
+                parent_obj = Comment.objects.get(id=parent_id)
+                if parent_obj:
+                    reply_comment= Comment(comment_author=request.user.username,comment_content=request.POST.get("comment_content"))
+                    reply_comment.parent = parent_obj
+                    reply_comment.article = article
+                    reply_comment.save()
+                    return redirect(reverse("article:detail", kwargs={"id": id}))
+
             comment_content = request.POST.get("comment_content")
 
             newComment = Comment(comment_author=request.user.username, comment_content=comment_content)
@@ -343,7 +377,7 @@ class TakeCourse(View):
         taken_course.student = student
 
         taken_course.article = article
-        taken_course.score = 0
+
         taken_course.save()
 
         # creation of taken courses' videos for the student
@@ -383,6 +417,8 @@ class RateCourse(View):
         id=request.POST['article_id']
         article = get_object_or_404(Article, id=id)
         student = get_object_or_404(Student, user_id=request.user.id)
+
+
         if article in student.courses.all():
             takencourse = get_object_or_404(TakenCourse,article_id =id,student_id =request.user.id)
             takencourse.score = request.POST.get('val') # it should be the score that student gave
@@ -392,7 +428,7 @@ class RateCourse(View):
 
 
 
-        return redirect("article:detail")
+        return redirect("article:takencourses")
 
 class CompleteVideo(View):
     @method_decorator(login_required(login_url="user:login"))

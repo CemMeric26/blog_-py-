@@ -17,19 +17,20 @@
 
             <h6> Course duration: <span class="badge badge-pill badge-success">{{ video.duration_str }}</span> <span class="badge badge-pill badge-success">{{ video.duration }}<span> seconds </h6>
 
+            {% if request.user.is_student %}
 
             <input onclick="completeVideo({{ video.id }})" type="checkbox" class="form-check-input" id="complete"><label for="complete">Complete video </label>
                     <br>
-
+                <div id="confirm-box"></div>
+            {% endif %}
 
         </div>
 
 
     </div>
 
-
     {% endfor %}
-
+    
 
 <script>
 
@@ -46,7 +47,7 @@ const completeVideo = (id) =>{
                 },
                 success: function(response){
                     //console.log(response)
-                    //confirmBox.innerHTML = `<h6>Successfully toggled video as completed</h6>`
+                    confirmBox.innerHTML = `<h6>Successfully toggled video as completed</h6>`
                 },
                 error: function(error){
                     //console.log(error)

@@ -29,9 +29,58 @@
                 </p>
             </section>
         </article>
+    <hr>
+    <br>
+    {% if request.user.is_student %}
+        <button><a href="{% url "article:take" article.id %}" class="btn btn-danger"> Take Course </a></button>
+        <button><a href="{% url "article:drop" article.id %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to drop course?')"> Drop Course </a></button>
+
+    {% endif %}
+    <hr>
+             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <h4>Course Videos Page:</h4>
+        {% if flag %}
+
+            <button><a href="{% url "article:videos" article.id %}" class="btn btn-primary btn-lg btn-block"> You can watch the course videos from here!!</a></button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            {% else %}
+            <div class="alert alert-danger" role="alert">
+                Unfortunately, to watch the videos you have to own the course!
+            </div>
+
+        {% endif %}
+    <div>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        {% if request.user.is_student %}
+
+                {% if flag %}
+                <h2>Rate the Course!!</h2>
+                <div class="row">
+
+                    <div class="col text-center">
+                        <form class="rate-form" action="{% url 'article:rate' %}" method="POST" id="{{article.id}}">
+                            {% csrf_token %}
+                            <button type="submit" class="fa fa-star fa-3x my-btn" id="first"></button>
+                            <button type="submit" class="fa fa-star fa-3x my-btn" id="second"></button>
+                            <button type="submit" class="fa fa-star fa-3x my-btn" id="third"></button>
+                            <button type="submit" class="fa fa-star fa-3x my-btn" id="fourth"></button>
+                            <button type="submit" class="fa fa-star fa-3x my-btn" id="fifth"></button>
+                        </form>
+                        <br>
+                        <div id="confirm-box"></div>
+                    </div>
+
+                </div>
+                    {% endif %}
+
+        {% endif %}
+            </div>
+
+
         <h4>Comments:</h4>
         {%if comments %}
             {%for comment in comments%}
+                {% if not comment.parent %}
             <!-- Single comment-->
             <div class="d-flex">
                 <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
@@ -42,8 +91,50 @@
                     <br>
                     {{comment.comment_content}}
                     </p>
+
+                    {% for reply in comment.replies.all  %}
+                        <div class="d-flex">
+                            <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
+                                <div class="ms-3">
+                                    <div class="fw-bold" style="padding-left:4px"><strong>{{reply.comment_author}}</strong></div>
+                                    <p style="padding-left:4px"> {{reply.comment_date}}
+
+                                    <br>
+                                    {{reply.comment_content}}
+                                    </p>
+
+                                </div>
+
+                        </div>
+
+                    {% endfor %}
+
+
+                    <h6 class="card-header"><strong>Reply to comment:</strong></h6>
+
+                            <!-- Reply form-->
+                            <form method="post" class="mb-4" action="{%url 'article:comment' article.id %}">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label style="padding-left:5px" for="formGroupExampleInput">Name:</label>
+                                    <p class="font-weight-bold">@{{ request.user.username }}</p>
+                                  </div>
+                                  <div class="form-group">
+                                    <label style="padding-left:5px" for="formGroupExampleInput">Reply:</label>
+                                  <textarea name = "comment_content" class="form-control" rows="3"></textarea>
+                                </div>
+                                <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                                <input class="btn btn-primary" type="submit" value="Reply">
+                            </form>
+
+
                 </div>
+
             </div>
+                {% endif %}
+
+
+
             <br>
             {%endfor%}
             {%else%}
@@ -54,10 +145,6 @@
             </div>
             <br>
             {%endif%}
-            <br>
-            <hr>
-            <h4>Course Videos Page:</h4>
-            <button><a href="{% url "article:videos" article.id %}" class="btn btn-primary btn-lg btn-block"> You can watch the course videos from here!!</a></button>
 
         <hr>
         <div class="card bg-light">
@@ -77,35 +164,15 @@
                     <button type="submit" class="btn btn-danger">Add</button>
                 </form>
             </div>
-            <div>
-                <h2>Rate the Course!!</h2>
-                    <div class="row">
-
-            <div class="col text-center">
-                <form class="rate-form" action="{% url 'article:rate' %}" method="POST" id="{{article.id}}">
-                    {% csrf_token %}
-                    <button type="submit" class="fa fa-star fa-3x my-btn" id="first"></button>
-                    <button type="submit" class="fa fa-star fa-3x my-btn" id="second"></button>
-                    <button type="submit" class="fa fa-star fa-3x my-btn" id="third"></button>
-                    <button type="submit" class="fa fa-star fa-3x my-btn" id="fourth"></button>
-                    <button type="submit" class="fa fa-star fa-3x my-btn" id="fifth"></button>
-                </form>
-                <br>
-                <div id="confirm-box"></div>
-            </div>
 
         </div>
-            </div>
 
-        </div>
-    </div>                  
+
+
 </div>
-    <br>
-    {% if request.user.is_student %}
-        <button><a href="{% url "article:take" article.id %}" class="btn btn-danger"> Take Course </a></button>
-        <button><a href="{% url "article:drop" article.id %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to drop course?')"> Drop Course </a></button>
 
-    {% endif %}
+
+    </div>
 
 
 

@@ -1,5 +1,5 @@
 {%extends "layout.html" %}
-
+{% load mathfilters %}
 {%block body%}
 
 <div class="row">
@@ -65,7 +65,7 @@
                 <p>
                    <span class="badge badge-info" >Course Length:</span>
                     {% if article.duration_sum %}
-                         <span class="badge badge-pill badge-success">{{article.duration_sum}} seconds</span>
+                         <span class="badge badge-pill badge-success">{{article.duration_sum |intdiv:60}} min {{article.duration_sum |mod:60}} sec </span>
                     {% else %}
                         ...
                     {% endif %}

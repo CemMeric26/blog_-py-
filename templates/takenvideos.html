@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+{% load embed_video_tags %}
+
+
+{% block body %}
+    {% if flag %}
+    <h1 class="mb-5">Course Videos</h1>
+    <div class="d-flex flex-wrap">
+        {% for takenvideo in takenvideos %}
+        <div class="px-3 mb-5">
+            <div class="d-flex justify justify-content-start">
+
+                <h5 > <strong>{{ forloop.counter }}. Lesson:  <h5> {{ takenvideo.video.title }} </h5> </strong> </h5>
+
+            </div>
+            {% video takenvideo.video.url '426x240' %}
+
+            <h6> Course duration: <span class="badge badge-pill badge-success">{{ takenvideo.video.duration_str }}</span> <span class="badge badge-pill badge-success">{{ takenvideo.video.duration }}<span> seconds </h6>
+
+
+            {% if takenvideo.is_completed_video %}
+                <button onclick="completeVideo({{ takenvideo.video.id }})" type="button" class="btn btn-warning" id="complete"><label for="complete">Uncomplete video </label>
+
+                <div><span class="badge badge-pill badge-warning" id="confirm-box"></span></div>
+
+
+            {% else %}
+                <button onclick="completeVideo({{ takenvideo.video.id }})" type="button" class="btn btn-success" id="complete"><label for="complete">Complete video </label>
+
+               <div><span class="badge badge-pill badge-success" id="confirm-box"></span></div>
+            {% endif %}
+
+        </div>
+
+
+    </div>
+
+    {% endfor %}
+    {% else %}
+        <h2> <strong> If you want to watch videos you have to own course ;)) !</strong> </h2>
+    {% endif %}
+
+<script>
+
+
+
+const completeVideo = (id) =>{
+    $.ajax({
+                type: 'POST',
+                url: "{% url 'article:complete' %}",
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'video_id': id,
+
+                },
+                success: function(response){
+                    //console.log(response)
+                    confirmBox.innerHTML = `<h6>Action is succesful!</h6>`
+                },
+                error: function(error){
+                    //console.log(error)
+                    //confirmBox.innerHTML = '<h6>Ups... something went wrong</h6>'
+                }
+            })}
+
+</script>
+
+
+{% endblock %}
