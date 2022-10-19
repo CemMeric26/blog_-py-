@@ -65,12 +65,17 @@
 
             </p>
             <p>
-                <span class="badge badge-info" >Completed percentage</span>
+                <span class="badge badge-info" >Completed percentage:</span>
                     {% if course.is_takencourse_completed %}
-                        <span class="badge badge-pill badge-success"> %{{course.is_takencourse_completed}}</span>
 
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: {{course.is_takencourse_completed}}%;" aria-valuenow="{{course.is_takencourse_completed}}" aria-valuemin="0" aria-valuemax="100">{{course.is_takencourse_completed}}%</div>
+                    </div>
                 {% else %}
                     You haven't started to course yet
+                        <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: {{course.is_takencourse_completed}}%;" aria-valuenow="{{course.is_takencourse_completed}}" aria-valuemin="0" aria-valuemax="100">{{course.is_takencourse_completed}}%</div>
+                    </div>
                 {% endif %}
 
             </p>

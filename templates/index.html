@@ -9,11 +9,13 @@
     </p>
 </div>
  <br><br><br><br>
-    <h2>Top Rated Courses</h2>
+    <h2><strong>Top Rated Courses</strong></h2>
+    <hr>
+    &nbsp;&nbsp;
 
 
 {%for article in page_obj%}
-{% if article.avg_score %}
+
 <div class="row">
     <div class="col-lg-10">
         <!-- Post content-->
@@ -57,7 +59,7 @@
     </div>
 
 </div>
-{% endif %}
+
 {%endfor%}
 <br>
 <div class="pagination">

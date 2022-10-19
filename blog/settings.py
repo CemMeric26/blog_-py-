@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "django_cleanup",
     'django_forms_bootstrap',
     'embed_video',
+    'mathfilters',
 ]
 
 MIDDLEWARE = [
